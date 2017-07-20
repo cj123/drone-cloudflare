@@ -20,6 +20,14 @@ func main() {
 		domain = os.Getenv("PLUGIN_DOMAIN")
 	)
 
+	if apikey == "" {
+		apikey = os.Getenv("CLOUDFLARE_APIKEY")
+	}
+
+	if email == "" {
+		email = os.Getenv("CLOUDFLARE_EMAIL")
+	}
+
 	if apikey == "" || email == "" || domain == "" {
 		fmt.Println("Incorrect parameters specified")
 		os.Exit(1)
