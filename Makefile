@@ -25,7 +25,7 @@ test:
 	@for PKG in $(PACKAGES); do go test -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
 
 docker:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)'
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -ldflags '-s -w $(LDFLAGS)'
 	docker build --rm -t $(IMAGE) .
 
 $(EXECUTABLE): $(wildcard *.go)

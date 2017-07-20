@@ -5,39 +5,27 @@ import (
 	"os"
 
 	"github.com/cloudflare/cloudflare-go"
-	"github.com/drone/drone-go/plugin"
 )
 
 var (
 	buildCommit string
 )
 
-type CloudFlare struct {
-	APIKey string `json:"apikey"`
-	Email  string `json:"email"`
-	Domain string `json:"domain"`
-}
-
 func main() {
 	fmt.Printf("Drone CloudFlare Plugin built from %s\n", buildCommit)
 
-	args := CloudFlare{}
+	var (
+		apikey = os.Getenv("PLUGIN_APIKEY")
+		email  = os.Getenv("PLUGIN_EMAIL")
+		domain = os.Getenv("PLUGIN_DOMAIN")
+	)
 
-	plugin.Param("vargs", &args)
-
-	err := plugin.Parse()
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	if len(args.APIKey) == 0 || len(args.Email) == 0 || len(args.Domain) == 0 {
+	if apikey == "" || email == "" || domain == "" {
 		fmt.Println("Incorrect parameters specified")
 		os.Exit(1)
 	}
 
-	cf, err := cloudflare.New(args.APIKey, args.Email)
+	cf, err := cloudflare.New(apikey, email)
 
 	if err != nil {
 		fmt.Printf("Unable to initialise client: %s\n", err.Error())
@@ -55,13 +43,13 @@ func main() {
 	var zoneID string
 
 	for _, zone := range zones {
-		if zone.Name == args.Domain {
+		if zone.Name == domain {
 			zoneID = zone.ID
 		}
 	}
 
 	if len(zoneID) == 0 {
-		fmt.Printf("Unable to find zone for: %s\n", args.Domain)
+		fmt.Printf("Unable to find zone for: %s\n", domain)
 		os.Exit(1)
 	}
 
@@ -72,5 +60,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("Cache successfully purged for %s (zone ID: %s)\n", args.Domain, zoneID)
+	fmt.Printf("Cache successfully purged for %s (zone ID: %s)\n", domain, zoneID)
 }

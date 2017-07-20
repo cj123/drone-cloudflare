@@ -1,9 +1,20 @@
-build:
-  image: golang:latest
-  environment:
+workspace:
+  base: /go
+  path: src/github.com/cj123/drone-cloudflare
+
+pipeline:
+  build:
+    image: golang:1.8
+    environment:
     - CGO_ENABLED=0
-  commands:
+    commands:
     - make deps
     - make vet
     - make build
     - make test
+
+  docker:
+    image: plugins/docker
+    secrets: [ docker_username, docker_password ]
+    repo: seejy/drone-cloudflare
+    tags: latest
